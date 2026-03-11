@@ -54,6 +54,57 @@ compute_sha256() {
   exit 1
 }
 
+archive_has_single_root_dir() {
+  tar -tzf "$1" | awk '
+    {
+      path=$0
+      sub(/^\.\//, "", path)
+      if (path == "") {
+        next
+      }
+
+      split(path, parts, "/")
+      root=parts[1]
+      if (!(root in roots)) {
+        roots[root]=1
+        root_count++
+      }
+      if (index(path, "/") > 0) {
+        has_nested_entries=1
+      }
+    }
+    END {
+      if (root_count == 1 && has_nested_entries == 1) {
+        print 1
+        exit
+      }
+      print 0
+    }
+  '
+}
+
+validate_runtime_layout() {
+  if [ ! -f "$1/package.json" ]; then
+    printf 'runtime archive missing package.json at archive root\n' >&2
+    exit 1
+  fi
+
+  if [ ! -f "$1/zmail" ]; then
+    printf 'runtime archive missing zmail entrypoint at archive root\n' >&2
+    exit 1
+  fi
+}
+
+install_runtime_dependencies() {
+  if [ -f "$1/package-lock.json" ]; then
+    npm ci --omit=dev
+    return
+  fi
+
+  printf 'package-lock.json not found; falling back to npm install --omit=dev\n' >&2
+  npm install --omit=dev
+}
+
 TMP_DIR="$(mktemp -d)"
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -81,10 +132,17 @@ fi
 
 rm -rf "$ZMAIL_RUNTIME_NEW_DIR" "$ZMAIL_RUNTIME_OLD_DIR"
 mkdir -p "$ZMAIL_RUNTIME_NEW_DIR"
-tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" -C "$ZMAIL_RUNTIME_NEW_DIR"
+
+if [ "$(archive_has_single_root_dir "$TMP_DIR/zmail-openclaw-client.tar.gz")" = "1" ]; then
+  tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" --strip-components=1 -C "$ZMAIL_RUNTIME_NEW_DIR"
+else
+  tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" -C "$ZMAIL_RUNTIME_NEW_DIR"
+fi
+
+validate_runtime_layout "$ZMAIL_RUNTIME_NEW_DIR"
 
 cd "$ZMAIL_RUNTIME_NEW_DIR"
-npm ci --omit=dev
+install_runtime_dependencies "$ZMAIL_RUNTIME_NEW_DIR"
 
 if [ -d "$ZMAIL_RUNTIME_DIR" ]; then
   mv "$ZMAIL_RUNTIME_DIR" "$ZMAIL_RUNTIME_OLD_DIR"
