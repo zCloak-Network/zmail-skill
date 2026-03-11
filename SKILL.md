@@ -30,11 +30,10 @@ scripts/install.sh
 
 What it does:
 
-- downloads a zMail repo snapshot into `~/zMail/runtime`
-- installs dependencies and builds the runtime there
+- downloads the public runtime bundle from `zCloak-Network/zmail-skill` releases
+- unpacks it into `~/zMail/runtime`
 - writes `~/zMail/zmail`
 - bootstraps `default` from `~/.config/zcloak/ai-id.pem` if present and no registry exists yet
-- defaults to the org repo at `https://github.com/zCloak-Network/zMail`
 
 ## Update
 
