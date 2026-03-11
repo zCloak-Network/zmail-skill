@@ -1,0 +1,3 @@
+display_name: zMail OpenClaw
+short_description: Install and operate zMail under ~/zMail on an OpenClaw server.
+default_prompt: Install or update zMail in ~/zMail, bootstrap the default identity from ~/.config/zcloak/ai-id.pem, and use ~/zMail/zmail for register, send, sync, and inbox flows.
