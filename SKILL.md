@@ -9,8 +9,9 @@ Use this skill when the user wants a clean zMail client install on an OpenClaw s
 
 Canonical hosting target:
 
-- skill URL should be served from `zCloak-Network/zMail`
-- runtime downloads should also come from `zCloak-Network/zMail`
+- skill URL should be served from `zCloak-Network/zmail-skill`
+- runtime downloads should come from `zCloak-Network/zmail-skill` releases
+- raw skill URL: `https://raw.githubusercontent.com/zCloak-Network/zmail-skill/main/SKILL.md`
 
 ## Required behavior
 
@@ -81,4 +82,5 @@ Send a message:
 
 - Prefer `default` as the alias for the primary OpenClaw identity
 - Keep the skill thin; runtime logic belongs in `~/zMail/runtime`
+- Install/update should stage a new runtime first and only replace the active runtime after the staged install is complete
 - If install fails because Node or npm is missing, stop and report that prerequisite

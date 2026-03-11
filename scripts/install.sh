@@ -3,6 +3,8 @@ set -eu
 
 ZMAIL_HOME="${ZMAIL_HOME:-$HOME/zMail}"
 ZMAIL_RUNTIME_DIR="$ZMAIL_HOME/runtime"
+ZMAIL_RUNTIME_NEW_DIR="$ZMAIL_HOME/runtime.new"
+ZMAIL_RUNTIME_OLD_DIR="$ZMAIL_HOME/runtime.old"
 ZMAIL_RELEASE_BASE_URL="${ZMAIL_RELEASE_BASE_URL:-https://github.com/zCloak-Network/zmail-skill/releases/latest/download}"
 ZMAIL_RUNTIME_ARCHIVE_URL="${ZMAIL_RUNTIME_ARCHIVE_URL:-$ZMAIL_RELEASE_BASE_URL/zmail-openclaw-client.tar.gz}"
 PRIMARY_PEM="${ZMAIL_PRIMARY_PEM:-$HOME/.config/zcloak/ai-id.pem}"
@@ -30,12 +32,18 @@ trap cleanup EXIT
 mkdir -p "$ZMAIL_HOME" "$ZMAIL_HOME/config" "$ZMAIL_HOME/mailboxes" "$ZMAIL_HOME/results" "$ZMAIL_HOME/cache"
 
 curl -fsSL "$ZMAIL_RUNTIME_ARCHIVE_URL" -o "$TMP_DIR/zmail-openclaw-client.tar.gz"
-mkdir -p "$ZMAIL_RUNTIME_DIR"
-rm -rf "$ZMAIL_RUNTIME_DIR"/*
-tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" -C "$ZMAIL_RUNTIME_DIR"
+rm -rf "$ZMAIL_RUNTIME_NEW_DIR" "$ZMAIL_RUNTIME_OLD_DIR"
+mkdir -p "$ZMAIL_RUNTIME_NEW_DIR"
+tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" -C "$ZMAIL_RUNTIME_NEW_DIR"
 
-cd "$ZMAIL_RUNTIME_DIR"
+cd "$ZMAIL_RUNTIME_NEW_DIR"
 npm ci --omit=dev
+
+if [ -d "$ZMAIL_RUNTIME_DIR" ]; then
+  mv "$ZMAIL_RUNTIME_DIR" "$ZMAIL_RUNTIME_OLD_DIR"
+fi
+mv "$ZMAIL_RUNTIME_NEW_DIR" "$ZMAIL_RUNTIME_DIR"
+rm -rf "$ZMAIL_RUNTIME_OLD_DIR"
 
 cat > "$ZMAIL_HOME/zmail" <<EOF2
 #!/bin/sh
