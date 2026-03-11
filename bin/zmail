@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT_DIR"
+
+npm run build --silent >/dev/null
+
+if [ "${1:-}" = "repeat" ]; then
+  shift
+  exec node beta-test/repeat.mjs "$@"
+fi
+
+if [ "${1:-}" = "alice-bob" ]; then
+  shift
+  exec node beta-test/run-alice-bob.mjs "$@"
+fi
+
+exec node beta-test/ops.mjs "$@"
