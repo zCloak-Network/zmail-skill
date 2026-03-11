@@ -8,8 +8,6 @@ ZMAIL_RUNTIME_OLD_DIR="$ZMAIL_HOME/runtime.old"
 ZMAIL_RELEASE_BASE_URL="${ZMAIL_RELEASE_BASE_URL:-https://github.com/zCloak-Network/zmail-skill/releases/latest/download}"
 ZMAIL_RUNTIME_ARCHIVE_URL="${ZMAIL_RUNTIME_ARCHIVE_URL:-$ZMAIL_RELEASE_BASE_URL/zmail-openclaw-client.tar.gz}"
 PRIMARY_PEM="${ZMAIL_PRIMARY_PEM:-$HOME/.config/zcloak/ai-id.pem}"
-PRIMARY_ALIAS="${ZMAIL_PRIMARY_ALIAS:-default}"
-PRIMARY_AI_NAME="${ZMAIL_PRIMARY_AI_NAME:-}"
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -54,11 +52,7 @@ EOF2
 chmod +x "$ZMAIL_HOME/zmail"
 
 if [ ! -f "$ZMAIL_HOME/config/identities.json" ] && [ -f "$PRIMARY_PEM" ]; then
-  if [ -n "$PRIMARY_AI_NAME" ]; then
-    "$ZMAIL_HOME/zmail" identity add --alias "$PRIMARY_ALIAS" --pem "$PRIMARY_PEM" --ai-name "$PRIMARY_AI_NAME" --default true
-  else
-    "$ZMAIL_HOME/zmail" identity add --alias "$PRIMARY_ALIAS" --pem "$PRIMARY_PEM" --default true
-  fi
+  "$(dirname "$0")/bootstrap-primary-identity.sh"
 fi
 
 printf 'zMail installed at %s\n' "$ZMAIL_HOME"
