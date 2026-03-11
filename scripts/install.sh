@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 ZMAIL_HOME="${ZMAIL_HOME:-$HOME/zMail}"
 ZMAIL_RUNTIME_DIR="$ZMAIL_HOME/runtime"
 ZMAIL_RUNTIME_NEW_DIR="$ZMAIL_HOME/runtime.new"
@@ -54,11 +55,11 @@ EOF2
 chmod +x "$ZMAIL_HOME/zmail"
 
 if [ ! -f "$ZMAIL_HOME/config/identities.json" ] && [ -f "$PRIMARY_PEM" ]; then
-  if [ -n "$PRIMARY_AI_NAME" ]; then
-    "$ZMAIL_HOME/zmail" identity add --alias "$PRIMARY_ALIAS" --pem "$PRIMARY_PEM" --ai-name "$PRIMARY_AI_NAME" --default true
-  else
-    "$ZMAIL_HOME/zmail" identity add --alias "$PRIMARY_ALIAS" --pem "$PRIMARY_PEM" --default true
-  fi
+  ZMAIL_HOME="$ZMAIL_HOME" \
+  ZMAIL_PRIMARY_PEM="$PRIMARY_PEM" \
+  ZMAIL_PRIMARY_ALIAS="$PRIMARY_ALIAS" \
+  ZMAIL_PRIMARY_AI_NAME="$PRIMARY_AI_NAME" \
+  sh "$SCRIPT_DIR/bootstrap-primary-identity.sh"
 fi
 
 printf 'zMail installed at %s\n' "$ZMAIL_HOME"
