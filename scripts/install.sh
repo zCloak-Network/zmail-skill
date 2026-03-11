@@ -34,6 +34,9 @@ mkdir -p "$ZMAIL_RUNTIME_DIR"
 rm -rf "$ZMAIL_RUNTIME_DIR"/*
 tar -xzf "$TMP_DIR/zmail-openclaw-client.tar.gz" -C "$ZMAIL_RUNTIME_DIR"
 
+cd "$ZMAIL_RUNTIME_DIR"
+npm ci --omit=dev
+
 cat > "$ZMAIL_HOME/zmail" <<EOF2
 #!/bin/sh
 set -eu
