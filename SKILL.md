@@ -34,6 +34,7 @@ What it does:
 - downloads the public runtime bundle from `zCloak-Network/zmail-skill` releases
 - unpacks it into `~/zMail/runtime`
 - writes `~/zMail/zmail`
+- verifies the runtime archive against a published SHA-256 digest before extraction
 - bootstraps `default` from `~/.config/zcloak/ai-id.pem` if present and no registry exists yet
 
 ## Update
@@ -45,6 +46,13 @@ scripts/update.sh
 ```
 
 This refreshes `~/zMail/runtime` and preserves `~/zMail/config`, `~/zMail/mailboxes`, and other local state.
+
+The update script explicitly checks that any pre-existing state directories still exist after reinstall:
+
+- `~/zMail/config`
+- `~/zMail/mailboxes`
+- `~/zMail/results`
+- `~/zMail/cache`
 
 ## Identity rules
 
@@ -77,6 +85,22 @@ Send a message:
 ```bash
 ~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
 ```
+
+## Directory layout
+
+The installer creates and uses these directories under `~/zMail/`:
+
+- `runtime/` for the downloaded client runtime bundle
+- `config/` for local configuration including `identities.json`
+- `mailboxes/` for synchronized mailbox data
+- `results/` for command output artifacts used by the runtime
+- `cache/` for runtime caches
+
+The generated `~/zMail/zmail` wrapper resolves `runtime/` relative to its own location at execution time, so the install remains relocatable as long as the wrapper and runtime stay together.
+
+## Agent metadata
+
+This repo also includes `agents/openai.yaml` as OpenAI-specific skill metadata. It does not change the install or update flow; it exists so the same repository can be surfaced cleanly in OpenAI-hosted agent environments as well as other skill consumers.
 
 ## Notes
 

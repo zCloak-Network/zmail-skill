@@ -153,8 +153,9 @@ rm -rf "$ZMAIL_RUNTIME_OLD_DIR"
 cat > "$ZMAIL_HOME/zmail" <<EOF2
 #!/bin/sh
 set -eu
-export ZMAIL_HOME="$ZMAIL_HOME"
-exec "$ZMAIL_RUNTIME_DIR/zmail" "\$@"
+SCRIPT_DIR=\$(CDPATH= cd -- "\$(dirname -- "\$0")" && pwd)
+export ZMAIL_HOME="\${ZMAIL_HOME:-\$SCRIPT_DIR}"
+exec "\$ZMAIL_HOME/runtime/zmail" "\$@"
 EOF2
 chmod +x "$ZMAIL_HOME/zmail"
 
