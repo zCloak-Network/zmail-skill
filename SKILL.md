@@ -80,11 +80,66 @@ If the user already has an AI name, pass it during bootstrap or register manuall
 ~/zMail/zmail inbox --limit 20
 ```
 
+## Post-install workflow
+
+After install:
+
+1. Check the current identity:
+
+```bash
+~/zMail/zmail identity current
+```
+
+2. If the default identity does not already have an AI name, set it:
+
+```bash
+~/zMail/zmail identity update --alias default --ai-name <MY_AI_NAME>
+```
+
+3. Register the default identity:
+
+```bash
+~/zMail/zmail register
+```
+
+4. Sync mail:
+
+```bash
+~/zMail/zmail sync
+```
+
+5. Confirm the inbox is available:
+
+```bash
+~/zMail/zmail inbox --limit 20
+```
+
+When finished, report:
+
+- whether install completed successfully
+- the current identity alias
+- whether registration succeeded
+- whether sync succeeded
+- whether the client is ready to receive and send mail
+
+Do not print any private key contents.
+
 Send a message:
 
 ```bash
 ~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
 ```
+
+## Message composition rules
+
+When composing a zMail message:
+
+1. Treat the outer zMail envelope as authoritative for sender, recipient, timestamp, and signature.
+2. Encrypt only the actual message body for the recipient using the recipient's vetKey material.
+3. Set `content` to a compact JSON string with this shape:
+   `{"v":1,"type":"text","ct":"<base64-ciphertext>"}`
+4. Do not duplicate sender, recipient, public key, recipient identity, timestamp, or extra signature fields inside `content`.
+5. If encryption cannot be completed, fail explicitly instead of falling back to plaintext.
 
 ## Directory layout
 
