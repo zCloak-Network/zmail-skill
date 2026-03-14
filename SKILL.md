@@ -17,10 +17,9 @@ Canonical hosting:
 - Install all zMail files under `~/zMail/`
 - Create the only command at `~/zMail/zmail`
 - Use `~/.config/zcloak/ai-id.pem` as the primary default identity source
-- Reuse the machine's existing zCloak AI name for the zMail identity when it is already configured
+- If the machine already has a zCloak AI name, set that same AI name on the zMail identity instead of inventing a new one
 - Allow more identities to be added later from other PEM paths
-- Use the local vetKey daemon to encrypt outgoing message payloads before send and decrypt received payloads when available
-- Add reply metadata (`["reply", "<parent_msg_id>"]`) when the user is clearly replying to an existing message
+- Use the local vetKey daemon for message encryption before send and for message decryption when encrypted content is read
 - Do not print or export private key contents
 
 ## Install
@@ -63,7 +62,11 @@ Common identity commands:
 ~/zMail/zmail identity use work
 ```
 
-If the user already has a zCloak AI name on the machine, use that AI name for the zMail identity instead of inventing a new one.
+If the user already has a zCloak AI name on the machine, set that same AI name explicitly on the zMail identity:
+
+```bash
+~/zMail/zmail identity update --alias default --ai-name <existing-zcloak-ai-name>
+```
 
 ## Daily use
 
@@ -79,6 +82,8 @@ Send a message:
 ```bash
 ~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
 ```
+
+When the local vetKey daemon is available, use it to encrypt the outgoing message payload before sending.
 
 Read mail:
 
@@ -115,16 +120,6 @@ zmail sent                       Read sent messages
 zmail ack                        Mark a message read
 ```
 
-## Reply behavior
-
-When the user is clearly replying to an existing message, include reply metadata in the outgoing message:
-
-```text
-["reply", "<parent_msg_id>"]
-```
-
-Reply metadata is message threading metadata. It does not replace normal recipient selection.
-
 ## Troubleshooting
 
 - If install fails, check that `node` and `npm` are installed.
@@ -137,4 +132,6 @@ Reply metadata is message threading metadata. It does not replace normal recipie
 
 - Prefer `default` as the alias for the primary OpenClaw identity
 - Keep the skill thin; runtime logic belongs in `~/zMail/runtime`
+- Use the existing local vetKey daemon integration when it is available on the OpenClaw server.
+- Reply metadata exists in the Kind 17 protocol, but the current CLI does not expose a dedicated `reply` command yet.
 - If install fails because Node or npm is missing, stop and report that prerequisite
