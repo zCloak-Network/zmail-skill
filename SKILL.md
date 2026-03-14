@@ -83,7 +83,17 @@ Send a message:
 ~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
 ```
 
-When the local vetKey daemon is available, use it to encrypt the outgoing message payload before sending.
+`content` is plaintext input. zMail must encrypt it with the local vetKey daemon before sending. If encryption fails, do not fall back to plaintext.
+
+## Message composition rules
+
+When zMail sends a message:
+
+1. Treat the outer zMail envelope as authoritative.
+2. Encrypt only the plaintext message body using the recipient's vetKey material.
+3. The transmitted `content` field must be a compact JSON string with this shape:
+   `{"v":1,"type":"text","ct":"<base64-ciphertext>"}`
+4. If encryption fails, do not fall back to plaintext.
 
 Reply to a message:
 
