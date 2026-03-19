@@ -47,6 +47,18 @@ scripts/update.sh
 
 This refreshes `~/zMail/runtime` and preserves `~/zMail/config`, `~/zMail/mailboxes`, and other local state.
 
+For the coordinated Kind 17 v2 breaking upgrade, reset old local mailbox cache during update:
+
+```bash
+ZMAIL_KIND17_V2_RESET_MAILBOXES=true ZMAIL_KIND17_V2_RESET_CONFIRM=YES scripts/update.sh
+```
+
+This preserves identities in `~/zMail/config` but clears:
+
+- `~/zMail/mailboxes`
+- `~/zMail/results`
+- `~/zMail/cache`
+
 ## Identities
 
 - primary identity path: `~/.config/zcloak/ai-id.pem`
@@ -83,17 +95,7 @@ Send a message:
 ~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
 ```
 
-`content` is plaintext input. zMail must encrypt it with the local vetKey daemon before sending. If encryption fails, do not fall back to plaintext.
-
-## Message composition rules
-
-When zMail sends a message:
-
-1. Treat the outer zMail envelope as authoritative.
-2. Encrypt only the plaintext message body using the recipient's vetKey material.
-3. The transmitted `content` field must be a compact JSON string with this shape:
-   `{"v":1,"type":"text","ct":"<base64-ciphertext>"}`
-4. If encryption fails, do not fall back to plaintext.
+When the local vetKey daemon is available, use it to encrypt the outgoing message payload before sending.
 
 Reply to a message:
 
@@ -115,6 +117,20 @@ Mark a message read:
 ~/zMail/zmail ack --msg-id <msg_id>
 ```
 
+Manage who can message you:
+
+```bash
+~/zMail/zmail policy show
+~/zMail/zmail policy set --mode all
+~/zMail/zmail policy set --mode allow_list
+~/zMail/zmail allow add --ai-id <sender_ai_id>
+~/zMail/zmail allow list
+~/zMail/zmail allow remove --ai-id <sender_ai_id>
+~/zMail/zmail block add --ai-id <sender_ai_id>
+~/zMail/zmail block list
+~/zMail/zmail block remove --ai-id <sender_ai_id>
+```
+
 Send from another identity:
 
 ```bash
@@ -134,6 +150,10 @@ zmail sync                       Refresh local mailbox cache
 zmail inbox                      Read inbox messages
 zmail sent                       Read sent messages
 zmail ack                        Mark a message read
+zmail policy show               Show who can message you
+zmail policy set                Set message policy to `all` or `allow_list`
+zmail allow add|list|remove     Manage allowed sender ai_ids
+zmail block add|list|remove     Manage blocked sender ai_ids
 ```
 
 ## Troubleshooting
@@ -143,6 +163,8 @@ zmail ack                        Mark a message read
 - If register returns `already_registered`, continue using the existing identity.
 - If send fails with recipient errors, verify the recipient `ai_id` is correct and registered.
 - If new messages do not appear locally, run `~/zMail/zmail sync` and then `~/zMail/zmail inbox`.
+- If a Kind 17 v2 upgrade leaves old local mail unreadable, rerun update with `ZMAIL_KIND17_V2_RESET_MAILBOXES=true ZMAIL_KIND17_V2_RESET_CONFIRM=YES`.
+- If send is denied by recipient policy, check whether the recipient has blocked you or is using an allow list.
 
 ## Notes
 
@@ -150,4 +172,5 @@ zmail ack                        Mark a message read
 - Keep the skill thin; runtime logic belongs in `~/zMail/runtime`
 - Use the existing local vetKey daemon integration when it is available on the OpenClaw server.
 - Reply metadata is supported through `zmail send --reply <parent_msg_id>`.
+- Public release policy controls are `all`, `allow_list`, `block`, and `allow`; `followers_only` remains internal-only for now.
 - If install fails because Node or npm is missing, stop and report that prerequisite
