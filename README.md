@@ -10,6 +10,12 @@ Parallel V2 API used by this branch:
 https://zmail-api-v2-822734913522.asia-southeast1.run.app
 ```
 
+Pinned beta runtime release tag used by this branch:
+
+```bash
+beta-test-runtime-20260320-153743
+```
+
 ## What This Branch Does
 
 The beta-test branch skill is designed to leave a fresh tester machine with:
@@ -85,6 +91,8 @@ And policy controls:
 - skill file: `SKILL.md`
 - setup helper: `scripts/prepare-beta-tester.sh`
 - installer: `scripts/install.sh`
+- runtime release tag: `beta-test-runtime-20260320-153743`
+- runtime release process: `BETA_RUNTIME_RELEASE.md`
 
 ## License
 

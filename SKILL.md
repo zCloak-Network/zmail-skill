@@ -23,6 +23,12 @@ Parallel V2 API:
 https://zmail-api-v2-822734913522.asia-southeast1.run.app
 ```
 
+Pinned beta runtime release tag:
+
+```bash
+beta-test-runtime-20260320-153743
+```
+
 ## Required behavior
 
 - Install all zMail files under `~/zMail/`
@@ -54,6 +60,8 @@ This beta install flow:
 - registers the current identity
 - syncs mailbox state once
 - prints the shareable tester `ai_id`
+
+This branch must not install from a generic `releases/latest` runtime bundle. It must use the pinned beta runtime release tag shown above unless an operator explicitly overrides `ZMAIL_RUNTIME_ARCHIVE_URL`.
 
 ## Update
 
