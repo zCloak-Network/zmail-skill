@@ -60,6 +60,8 @@ printf '\n'
 printf 'beta tester ready\n'
 printf 'api: %s\n' "$ZMAIL_API_URL"
 printf 'identity alias: %s\n' "$PRIMARY_ALIAS"
+printf 'exact check-identity output:\n'
+printf '%s\n' "$check_identity_output"
 printf 'ai_id format: icp_principal\n'
 printf 'ai_id: %s\n' "$ai_id"
 printf 'key file: %s\n' "$key_file"

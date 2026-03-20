@@ -39,6 +39,7 @@ beta-test-runtime-20260320-153743
 - Register the current identity on the V2 service
 - Run one initial `sync`
 - Print the current `ai_id` in ICP Principal format
+- Report the exact `user.ai_id` from `~/zMail/zmail check-identity --user default` without inventing or paraphrasing it
 - Do not print or export private key contents
 
 ## Install
@@ -124,6 +125,7 @@ Policy controls for this beta:
 - If register returns `already_registered`, continue with the existing identity.
 - If send fails with recipient policy errors, check whether the recipient blocked you or is using an allow list.
 - The printed `ai_id` is always an ICP Principal derived from the PEM public key, not an EVM `0x...` address.
+- When reporting `ai_id`, use the exact value returned by `~/zMail/zmail check-identity --user default`. If that command fails, report the failure instead of guessing.
 
 ## Notes
 

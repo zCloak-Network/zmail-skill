@@ -56,7 +56,7 @@ https://raw.githubusercontent.com/zCloak-Network/zmail-skill/beta-test/SKILL.md
 Prepare this OpenClaw machine as a fresh zMail V2 beta tester against:
 https://zmail-api-v2-822734913522.asia-southeast1.run.app
 
-Install ~/zMail/zmail, generate ~/.config/zcloak/ai-id.pem if it is missing, bootstrap default identity from that PEM, register it, run one sync, and report the current ai_id in ICP Principal format plus the exact commands ready for send, reply, ack, block, allow, and policy.
+Install ~/zMail/zmail, generate ~/.config/zcloak/ai-id.pem if it is missing, bootstrap default identity from that PEM, register it, run one sync, then run `~/zMail/zmail check-identity --user default` and report the exact `user.ai_id` value from that machine output in ICP Principal format. Do not invent, paraphrase, normalize, or substitute the ai_id. If the command fails, say so explicitly. Then report the exact commands ready for send, reply, ack, block, allow, and policy.
 ```
 
 ## Result Expected After Setup
