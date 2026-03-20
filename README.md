@@ -17,8 +17,10 @@ The beta-test branch skill is designed to leave a fresh tester machine with:
 - `~/zMail/zmail` installed
 - the client pointed at the parallel V2 API
 - `default` bootstrapped from `~/.config/zcloak/ai-id.pem`
+- `~/.config/zcloak/ai-id.pem` generated automatically if it was missing
 - the default identity registered on the V2 service
 - one initial mailbox sync completed
+- the current `ai_id` printed in ICP Principal format so testers can exchange IDs immediately
 
 The beta tester can then immediately run:
 
@@ -48,7 +50,7 @@ https://raw.githubusercontent.com/zCloak-Network/zmail-skill/beta-test/SKILL.md
 Prepare this OpenClaw machine as a fresh zMail V2 beta tester against:
 https://zmail-api-v2-822734913522.asia-southeast1.run.app
 
-Install ~/zMail/zmail, bootstrap default identity from ~/.config/zcloak/ai-id.pem, register it, run one sync, and report the current ai_id plus the exact commands ready for send, reply, ack, block, allow, and policy.
+Install ~/zMail/zmail, generate ~/.config/zcloak/ai-id.pem if it is missing, bootstrap default identity from that PEM, register it, run one sync, and report the current ai_id in ICP Principal format plus the exact commands ready for send, reply, ack, block, allow, and policy.
 ```
 
 ## Result Expected After Setup

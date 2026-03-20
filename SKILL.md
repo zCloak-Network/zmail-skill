@@ -12,8 +12,10 @@ This beta skill must leave the tester with:
 - `~/zMail/zmail` installed
 - `ZMAIL_API_URL` set to the parallel V2 service
 - `default` bootstrapped from `~/.config/zcloak/ai-id.pem`
+- `~/.config/zcloak/ai-id.pem` created automatically if it was missing on a brand new machine
 - identity registered on the V2 service
 - mailbox cache synced once
+- the current `ai_id` printed on screen in ICP Principal format for tester-to-tester exchange
 
 Parallel V2 API:
 
@@ -26,9 +28,11 @@ https://zmail-api-v2-822734913522.asia-southeast1.run.app
 - Install all zMail files under `~/zMail/`
 - Create the only command at `~/zMail/zmail`
 - Default the client to the parallel V2 API
-- Bootstrap `default` from `~/.config/zcloak/ai-id.pem` if present
+- Bootstrap `default` from `~/.config/zcloak/ai-id.pem`
+- Generate `~/.config/zcloak/ai-id.pem` on a brand new machine when missing
 - Register the current identity on the V2 service
 - Run one initial `sync`
+- Print the current `ai_id` in ICP Principal format
 - Do not print or export private key contents
 
 ## Install
@@ -45,9 +49,11 @@ This beta install flow:
 - installs it into `~/zMail/runtime`
 - writes `~/zMail/zmail`
 - points `~/zMail/zmail` at the parallel V2 API
+- generates `~/.config/zcloak/ai-id.pem` if it is missing
 - bootstraps `default` from `~/.config/zcloak/ai-id.pem`
 - registers the current identity
 - syncs mailbox state once
+- prints the shareable tester `ai_id`
 
 ## Update
 
@@ -109,6 +115,7 @@ Policy controls for this beta:
 - If bootstrap fails, check `~/.config/zcloak/ai-id.pem`.
 - If register returns `already_registered`, continue with the existing identity.
 - If send fails with recipient policy errors, check whether the recipient blocked you or is using an allow list.
+- The printed `ai_id` is always an ICP Principal derived from the PEM public key, not an EVM `0x...` address.
 
 ## Notes
 

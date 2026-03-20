@@ -9,6 +9,8 @@ ZMAIL_RELEASE_BASE_URL="${ZMAIL_RELEASE_BASE_URL:-https://github.com/zCloak-Netw
 ZMAIL_RUNTIME_ARCHIVE_URL="${ZMAIL_RUNTIME_ARCHIVE_URL:-$ZMAIL_RELEASE_BASE_URL/zmail-openclaw-client.tar.gz}"
 ZMAIL_API_URL="${ZMAIL_API_URL:-https://zmail-api-v2-822734913522.asia-southeast1.run.app}"
 PRIMARY_PEM="${ZMAIL_PRIMARY_PEM:-$HOME/.config/zcloak/ai-id.pem}"
+ZMAIL_GENERATE_PRIMARY_IDENTITY_ON_INSTALL="${ZMAIL_GENERATE_PRIMARY_IDENTITY_ON_INSTALL:-true}"
+ZMAIL_PREPARE_BETA_TESTER_ON_INSTALL="${ZMAIL_PREPARE_BETA_TESTER_ON_INSTALL:-true}"
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -53,14 +55,21 @@ exec "$ZMAIL_RUNTIME_DIR/zmail" "\$@"
 EOF2
 chmod +x "$ZMAIL_HOME/zmail"
 
+if [ ! -f "$PRIMARY_PEM" ] && [ "$ZMAIL_GENERATE_PRIMARY_IDENTITY_ON_INSTALL" = "true" ]; then
+  "$(dirname "$0")/generate-primary-identity.sh"
+fi
+
 if [ ! -f "$ZMAIL_HOME/config/identities.json" ] && [ -f "$PRIMARY_PEM" ]; then
   "$(dirname "$0")/bootstrap-primary-identity.sh"
 fi
 
-"$(dirname "$0")/prepare-beta-tester.sh"
+if [ "$ZMAIL_PREPARE_BETA_TESTER_ON_INSTALL" = "true" ] && [ -f "$ZMAIL_HOME/config/identities.json" ]; then
+  "$(dirname "$0")/prepare-beta-tester.sh"
+fi
 
 printf 'zMail installed at %s\n' "$ZMAIL_HOME"
 printf 'command: %s\n' "$ZMAIL_HOME/zmail"
 printf 'runtime archive: %s\n' "$ZMAIL_RUNTIME_ARCHIVE_URL"
 printf 'api url: %s\n' "$ZMAIL_API_URL"
 printf 'primary identity source: %s\n' "$PRIMARY_PEM"
+printf 'generate primary identity on install: %s\n' "$ZMAIL_GENERATE_PRIMARY_IDENTITY_ON_INSTALL"
