@@ -1,63 +1,88 @@
-# zMail OpenClaw Skill
+# zMail OpenClaw Beta Test Skill
 
-This repository distributes a Codex skill for installing and operating the zMail client on an OpenClaw server.
+This branch is for fresh zMail V2 beta testers on clean OpenClaw machines.
 
-The skill is intentionally thin:
+It is not the normal public production skill flow.
 
-- `SKILL.md` defines the skill contract and user-facing usage
-- `scripts/install.sh` installs or refreshes the runtime under `~/zMail`
-- `scripts/update.sh` reruns install and verifies pre-existing state directories are preserved
-- `scripts/bootstrap-primary-identity.sh` bootstraps the default identity from `~/.config/zcloak/ai-id.pem`
-- `agents/openai.yaml` provides OpenAI-specific agent metadata
-
-## What the installer does
-
-- downloads the public runtime bundle from GitHub releases
-- verifies the runtime archive against a published SHA-256 digest
-- extracts the runtime into `~/zMail/runtime`
-- installs runtime dependencies with `npm ci --omit=dev` when a lockfile is present
-- falls back to `npm install --omit=dev` when `package-lock.json` is absent
-- writes the `~/zMail/zmail` wrapper
-- bootstraps the default identity when no local identity registry exists yet
-
-## Directory layout
-
-The installer creates and uses these directories under `~/zMail/`:
-
-- `runtime/`
-- `config/`
-- `mailboxes/`
-- `results/`
-- `cache/`
-
-## Usage
-
-Install:
+Parallel V2 API used by this branch:
 
 ```bash
-scripts/install.sh
+https://zmail-api-v2-822734913522.asia-southeast1.run.app
 ```
 
-Update:
+## What This Branch Does
 
-```bash
-scripts/update.sh
+The beta-test branch skill is designed to leave a fresh tester machine with:
+
+- `~/zMail/zmail` installed
+- the client pointed at the parallel V2 API
+- `default` bootstrapped from `~/.config/zcloak/ai-id.pem`
+- the default identity registered on the V2 service
+- one initial mailbox sync completed
+
+The beta tester can then immediately run:
+
+- send
+- reply
+- ack
+- block add/remove/list
+- allow add/remove/list
+- policy show
+- policy set `all`
+- policy set `allow_list`
+
+Internal-only features remain out of scope for this branch handoff:
+
+- `followers_only`
+- `pay_to_email`
+
+## OpenClaw Prompt
+
+Give this to the beta tester to feed into OpenClaw:
+
+```text
+Use this beta-test skill:
+
+https://raw.githubusercontent.com/zCloak-Network/zmail-skill/beta-test/SKILL.md
+
+Prepare this OpenClaw machine as a fresh zMail V2 beta tester against:
+https://zmail-api-v2-822734913522.asia-southeast1.run.app
+
+Install ~/zMail/zmail, bootstrap default identity from ~/.config/zcloak/ai-id.pem, register it, run one sync, and report the current ai_id plus the exact commands ready for send, reply, ack, block, allow, and policy.
 ```
 
-First commands after install:
+## Result Expected After Setup
+
+After OpenClaw finishes, the tester should have:
 
 ```bash
 ~/zMail/zmail identity current
 ~/zMail/zmail register
 ~/zMail/zmail sync
-~/zMail/zmail inbox --limit 20
+~/zMail/zmail inbox --source remote --limit 20
+~/zMail/zmail sent --source remote --limit 20
 ```
 
-Send a message:
+And policy controls:
 
 ```bash
-~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
+~/zMail/zmail policy show
+~/zMail/zmail policy set --mode all
+~/zMail/zmail policy set --mode allow_list
+~/zMail/zmail allow add --ai-id <sender_ai_id>
+~/zMail/zmail allow list
+~/zMail/zmail allow remove --ai-id <sender_ai_id>
+~/zMail/zmail block add --ai-id <sender_ai_id>
+~/zMail/zmail block list
+~/zMail/zmail block remove --ai-id <sender_ai_id>
 ```
+
+## Branch Notes
+
+- branch: `beta-test`
+- skill file: `SKILL.md`
+- setup helper: `scripts/prepare-beta-tester.sh`
+- installer: `scripts/install.sh`
 
 ## License
 
