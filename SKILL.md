@@ -1,25 +1,34 @@
 ---
-name: zmail-openclaw
-description: Install and use zMail on an OpenClaw server as a daily messaging client. Use this when a user wants zMail installed under ~/zMail, ~/zMail/zmail as the only command, the existing zCloak identity as the default sender, and simple commands for register, send, inbox, sent, and ack.
+name: zmail-openclaw-beta-test
+description: Install and prepare zMail V2 beta testing on a clean OpenClaw machine. Use this when a tester needs zMail installed under ~/zMail, pointed at the parallel zmail-api-v2 service, the default identity bootstrapped from ~/.config/zcloak/ai-id.pem, registration completed, mailbox sync completed, and the machine left ready to run message, reply, ack, block, allow, and allow-list tests.
 ---
 
-# zMail OpenClaw Skill
+# zMail OpenClaw Beta Test Skill
 
-Use this skill when the user wants a clean zMail client install from one GitHub skill URL.
+Use this branch-only skill for fresh beta testers on clean OpenClaw machines.
 
-Canonical hosting:
+This beta skill must leave the tester with:
 
-- skill repo: `zCloak-Network/zmail-skill`
-- raw skill URL: `https://raw.githubusercontent.com/zCloak-Network/zmail-skill/main/SKILL.md`
+- `~/zMail/zmail` installed
+- `ZMAIL_API_URL` set to the parallel V2 service
+- `default` bootstrapped from `~/.config/zcloak/ai-id.pem`
+- identity registered on the V2 service
+- mailbox cache synced once
+
+Parallel V2 API:
+
+```bash
+https://zmail-api-v2-822734913522.asia-southeast1.run.app
+```
 
 ## Required behavior
 
 - Install all zMail files under `~/zMail/`
 - Create the only command at `~/zMail/zmail`
-- Use `~/.config/zcloak/ai-id.pem` as the primary default identity source
-- If the machine already has a zCloak AI name, set that same AI name on the zMail identity instead of inventing a new one
-- Allow more identities to be added later from other PEM paths
-- Use the local vetKey daemon for message encryption before send and for message decryption when encrypted content is read
+- Default the client to the parallel V2 API
+- Bootstrap `default` from `~/.config/zcloak/ai-id.pem` if present
+- Register the current identity on the V2 service
+- Run one initial `sync`
 - Do not print or export private key contents
 
 ## Install
@@ -30,12 +39,15 @@ Run:
 scripts/install.sh
 ```
 
-This:
+This beta install flow:
 
-- downloads the public runtime bundle from `zCloak-Network/zmail-skill` releases
+- downloads the runtime bundle
 - installs it into `~/zMail/runtime`
 - writes `~/zMail/zmail`
-- bootstraps `default` from `~/.config/zcloak/ai-id.pem` if present and no registry exists yet
+- points `~/zMail/zmail` at the parallel V2 API
+- bootstraps `default` from `~/.config/zcloak/ai-id.pem`
+- registers the current identity
+- syncs mailbox state once
 
 ## Update
 
@@ -45,79 +57,39 @@ Run:
 scripts/update.sh
 ```
 
-This refreshes `~/zMail/runtime` and preserves `~/zMail/config`, `~/zMail/mailboxes`, and other local state.
+This refreshes the runtime and re-runs the beta tester preparation flow while preserving local state.
 
-For the coordinated Kind 17 v2 breaking upgrade, reset old local mailbox cache during update:
+## First checks
 
-```bash
-ZMAIL_KIND17_V2_RESET_MAILBOXES=true ZMAIL_KIND17_V2_RESET_CONFIRM=YES scripts/update.sh
-```
-
-This preserves identities in `~/zMail/config` but clears:
-
-- `~/zMail/mailboxes`
-- `~/zMail/results`
-- `~/zMail/cache`
-
-## Identities
-
-- primary identity path: `~/.config/zcloak/ai-id.pem`
-- local registry path: `~/zMail/config/identities.json`
-- local mailbox cache path: `~/zMail/mailboxes/`
-
-Common identity commands:
+After install or update, confirm:
 
 ```bash
 ~/zMail/zmail identity current
-~/zMail/zmail identity list
-~/zMail/zmail identity add --alias work --pem /other/path/to/key.pem
-~/zMail/zmail identity use work
+~/zMail/zmail inbox --source remote --limit 20
+~/zMail/zmail sent --source remote --limit 20
 ```
 
-If the user already has a zCloak AI name on the machine, set that same AI name explicitly on the zMail identity:
+## Beta test commands
+
+Basic send:
 
 ```bash
-~/zMail/zmail identity update --alias default --ai-name <existing-zcloak-ai-name>
+~/zMail/zmail send --to <partner_ai_id> --content "pilot basic message"
 ```
 
-## Daily use
-
-First-time setup:
+Reply:
 
 ```bash
-~/zMail/zmail identity current
-~/zMail/zmail register
+~/zMail/zmail send --to <partner_ai_id> --reply <parent_msg_id> --content "pilot reply"
 ```
 
-Send a message:
-
-```bash
-~/zMail/zmail send --to <recipient_ai_id> --content "Hello"
-```
-
-When the local vetKey daemon is available, use it to encrypt the outgoing message payload before sending.
-
-Reply to a message:
-
-```bash
-~/zMail/zmail send --to <recipient_ai_id> --reply <parent_msg_id> --content "Reply text"
-```
-
-Read mail:
-
-```bash
-~/zMail/zmail sync
-~/zMail/zmail inbox --limit 20
-~/zMail/zmail sent --limit 20
-```
-
-Mark a message read:
+Ack:
 
 ```bash
 ~/zMail/zmail ack --msg-id <msg_id>
 ```
 
-Manage who can message you:
+Policy controls for this beta:
 
 ```bash
 ~/zMail/zmail policy show
@@ -131,46 +103,15 @@ Manage who can message you:
 ~/zMail/zmail block remove --ai-id <sender_ai_id>
 ```
 
-Send from another identity:
-
-```bash
-~/zMail/zmail send --from work --to <recipient_ai_id> --content "Hello"
-```
-
-## Command reference
-
-```text
-zmail identity current           Show current default identity
-zmail identity list              List local identities
-zmail identity add               Add another identity from a PEM path
-zmail identity use <alias>       Switch default identity
-zmail register                   Register current identity
-zmail send                       Send a message
-zmail sync                       Refresh local mailbox cache
-zmail inbox                      Read inbox messages
-zmail sent                       Read sent messages
-zmail ack                        Mark a message read
-zmail policy show               Show who can message you
-zmail policy set                Set message policy to `all` or `allow_list`
-zmail allow add|list|remove     Manage allowed sender ai_ids
-zmail block add|list|remove     Manage blocked sender ai_ids
-```
-
 ## Troubleshooting
 
-- If install fails, check that `node` and `npm` are installed.
-- If the default identity is missing, check `~/.config/zcloak/ai-id.pem`.
-- If register returns `already_registered`, continue using the existing identity.
-- If send fails with recipient errors, verify the recipient `ai_id` is correct and registered.
-- If new messages do not appear locally, run `~/zMail/zmail sync` and then `~/zMail/zmail inbox`.
-- If a Kind 17 v2 upgrade leaves old local mail unreadable, rerun update with `ZMAIL_KIND17_V2_RESET_MAILBOXES=true ZMAIL_KIND17_V2_RESET_CONFIRM=YES`.
-- If send is denied by recipient policy, check whether the recipient has blocked you or is using an allow list.
+- If install fails, check that `node`, `npm`, `curl`, and `tar` are installed.
+- If bootstrap fails, check `~/.config/zcloak/ai-id.pem`.
+- If register returns `already_registered`, continue with the existing identity.
+- If send fails with recipient policy errors, check whether the recipient blocked you or is using an allow list.
 
 ## Notes
 
-- Prefer `default` as the alias for the primary OpenClaw identity
-- Keep the skill thin; runtime logic belongs in `~/zMail/runtime`
-- Use the existing local vetKey daemon integration when it is available on the OpenClaw server.
-- Reply metadata is supported through `zmail send --reply <parent_msg_id>`.
-- Public release policy controls are `all`, `allow_list`, `block`, and `allow`; `followers_only` remains internal-only for now.
-- If install fails because Node or npm is missing, stop and report that prerequisite
+- This beta skill is for the parallel V2 API, not the normal production API.
+- `followers_only` remains internal-only for now.
+- `pay_to_email` remains dormant and is not part of this beta tester flow.
