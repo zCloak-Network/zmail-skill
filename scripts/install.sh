@@ -8,6 +8,7 @@ ZMAIL_RUNTIME_OLD_DIR="$ZMAIL_HOME/runtime.old"
 ZMAIL_RUNTIME_RELEASE_TAG="${ZMAIL_RUNTIME_RELEASE_TAG:-v0.2.0-rc.1}"
 ZMAIL_RELEASE_BASE_URL="${ZMAIL_RELEASE_BASE_URL:-https://github.com/zCloak-Network/zmail-skill/releases/download/$ZMAIL_RUNTIME_RELEASE_TAG}"
 ZMAIL_RUNTIME_ARCHIVE_URL="${ZMAIL_RUNTIME_ARCHIVE_URL:-$ZMAIL_RELEASE_BASE_URL/zmail-openclaw-client.tar.gz}"
+ZMAIL_DEFAULT_API_URL="${ZMAIL_DEFAULT_API_URL:-https://zmail-api-v2-822734913522.asia-southeast1.run.app}"
 PRIMARY_PEM="${ZMAIL_PRIMARY_PEM:-$HOME/.config/zcloak/ai-id.pem}"
 
 require_cmd() {
@@ -48,6 +49,7 @@ cat > "$ZMAIL_HOME/zmail" <<EOF2
 #!/bin/sh
 set -eu
 export ZMAIL_HOME="$ZMAIL_HOME"
+export ZMAIL_API_URL="\${ZMAIL_API_URL:-$ZMAIL_DEFAULT_API_URL}"
 exec "$ZMAIL_RUNTIME_DIR/zmail" "\$@"
 EOF2
 chmod +x "$ZMAIL_HOME/zmail"
@@ -60,4 +62,5 @@ printf 'zMail installed at %s\n' "$ZMAIL_HOME"
 printf 'command: %s\n' "$ZMAIL_HOME/zmail"
 printf 'runtime archive: %s\n' "$ZMAIL_RUNTIME_ARCHIVE_URL"
 printf 'runtime release tag: %s\n' "$ZMAIL_RUNTIME_RELEASE_TAG"
+printf 'default api url: %s\n' "$ZMAIL_DEFAULT_API_URL"
 printf 'primary identity source: %s\n' "$PRIMARY_PEM"

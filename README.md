@@ -5,6 +5,7 @@ This repository distributes a Codex skill for installing and operating the zMail
 Current pinned production runtime tag:
 
 - `v0.2.0-rc.1`
+- default backend for new installs: `https://zmail-api-v2-822734913522.asia-southeast1.run.app`
 
 The skill is intentionally thin:
 
@@ -21,6 +22,7 @@ The skill is intentionally thin:
 - extracts the runtime into `~/zMail/runtime`
 - installs runtime dependencies with `npm ci --omit=dev`
 - writes the `~/zMail/zmail` wrapper
+- points new installs at the V2 backend by default while keeping `ZMAIL_API_URL` overrideable
 - bootstraps the default identity when no local identity registry exists yet
 
 ## Directory layout

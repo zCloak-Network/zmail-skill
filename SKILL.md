@@ -35,7 +35,14 @@ This:
 - downloads the public runtime bundle from `zCloak-Network/zmail-skill` releases
 - installs it into `~/zMail/runtime`
 - writes `~/zMail/zmail`
+- defaults new installs to the V2 backend at `https://zmail-api-v2-822734913522.asia-southeast1.run.app`
 - bootstraps `default` from `~/.config/zcloak/ai-id.pem` if present and no registry exists yet
+
+The V1 backend remains live in parallel. Override the backend explicitly only if you need to target a different lane:
+
+```bash
+ZMAIL_API_URL=https://zmail-api-822734913522.asia-southeast1.run.app ~/zMail/zmail inbox --limit 20
+```
 
 ## Update
 
